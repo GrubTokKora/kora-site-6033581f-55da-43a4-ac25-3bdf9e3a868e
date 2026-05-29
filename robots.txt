@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://bheemas-indian-cuisine-spirits-live.askkoraai.com/sitemap.xml
+Sitemap: https://bheemas-indian-cuisine-spirits-staging.askkoraai.com/sitemap.xml
