@@ -41,44 +41,57 @@
       </div>
     </article>`).join('');
 
-  /* ---- menu ---- */
-  const cats = window.MENU.map(m => m.cat);
-  let activeCat = cats[0], vegOnly = false;
-  const tabsEl = $('#tabs'), listEl = $('#menulist');
-
+  /* ---- menu ----
+     Kora draws the menu from the site's menu data into the kora:data:menu region in #menulist: one tab per
+     category (Kora's own script shows one category at a time) and a "vegetarian" mark on veg dishes. Here
+     the tabs move into #tabs with this site's pill look, each dish gets its veg / non-veg dot and dotted
+     leader, and "Vegetarian only" filters the open category. */
+  const koraMenu = $('#menulist .kora-menu');
+  const tabsEl = $('#tabs');
+  let vegOnly = false;
   const tabLabel = (c) => c.replace(' / ', ' · ');
-  function renderTabs() {
-    tabsEl.innerHTML = cats.map(c => {
-      const on = c === activeCat;
-      return `<button data-cat="${c}" class="font-sans text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 sm:py-2.5 rounded-full transition-colors border whitespace-nowrap shrink-0 ${on ? 'bg-garnet text-parchment border-garnet' : 'bg-transparent text-ink-2 border-line-strong hover:border-garnet'}">${tabLabel(c)}</button>`;
-    }).join('');
+  const tabClass = (on) => `font-sans text-xs sm:text-sm font-semibold uppercase px-3 sm:px-4 py-2 sm:py-2.5 rounded-full transition-colors border whitespace-nowrap shrink-0 ${on ? 'bg-garnet text-parchment border-garnet' : 'bg-transparent text-ink-2 border-line-strong hover:border-garnet'}`;
+  const tabs = koraMenu ? $$('.kora-menu__switcher a', koraMenu) : [];
+
+  function syncTabs() {
+    tabs.forEach(t => { t.className = tabClass(t.getAttribute('aria-current') === 'true'); });
   }
   function renderList() {
-    const group = window.MENU.find(m => m.cat === activeCat);
-    const items = group.items.filter(it => !vegOnly || it.veg);
-    if (!items.length) {
-      listEl.innerHTML = `<p class="text-center text-ink-3 py-6">No vegetarian items in this section.</p>`;
-      return;
-    }
-    listEl.innerHTML = items.map((it, i) => `
-      <div class="py-5 ${i < items.length - 1 ? 'border-b border-line' : ''}">
-        <div class="flex items-baseline gap-3">
-          <span class="relative top-0.5">${dot(it.veg)}</span>
-          <span class="font-serif font-semibold text-[22px] text-ink">${it.n}</span>
-          ${it.heat ? `<span class="relative -top-px">${heatHTML(it.heat)}</span>` : ''}
-          ${it.star ? `<i data-lucide="star" class="w-3.5 h-3.5 text-saffron relative top-0.5"></i>` : ''}
-          <span class="leader"></span>
-          <span class="font-sans font-semibold text-[17px] text-garnet tabular-nums shrink-0">$${it.p}</span>
-        </div>
-        ${it.d ? `<p class="font-sans text-sm text-ink-3 mt-1.5 ml-[26px] leading-snug max-w-[640px]">${it.d}</p>` : ''}
-      </div>`).join('');
-    lucide.createIcons();
+    if (!koraMenu) return;
+    $$('.kora-menu__menu', koraMenu).forEach(menu => {
+      const rows = $$('.kora-menu__item', menu);
+      let last = null;
+      rows.forEach(row => {
+        const show = !vegOnly || row.classList.contains('kora-menu__item--vegetarian');
+        row.hidden = !show;
+        row.classList.remove('is-last');
+        if (show) last = row;
+      });
+      if (last) last.classList.add('is-last');
+      let empty = $('.menu-empty', menu);
+      if (!last && !empty) {
+        menu.insertAdjacentHTML('beforeend', `<p class="menu-empty text-center text-ink-3 py-6">No vegetarian items in this section.</p>`);
+      } else if (last && empty) {
+        empty.remove();
+      }
+    });
   }
-  renderTabs(); renderList();
-  tabsEl.addEventListener('click', e => {
-    const b = e.target.closest('[data-cat]'); if (!b) return;
-    activeCat = b.dataset.cat; renderTabs(); renderList();
-  });
+  if (koraMenu) {
+    tabs.forEach(t => {
+      t.textContent = tabLabel(t.textContent.trim());
+      t.addEventListener('click', syncTabs); // after Kora's listener has switched the category
+      tabsEl.appendChild(t);
+    });
+    $$('.kora-menu__item', koraMenu).forEach(row => {
+      const head = $('.kora-menu__item-head', row);
+      const name = $('.kora-menu__item-name', row);
+      const price = $('.kora-menu__item-price', row);
+      head.insertAdjacentHTML('afterbegin', `<span class="relative top-0.5">${dot(row.classList.contains('kora-menu__item--vegetarian'))}</span>`);
+      if (price) price.insertAdjacentHTML('beforebegin', '<span class="leader"></span>');
+      else name.insertAdjacentHTML('afterend', '<span class="leader"></span>');
+    });
+    syncTabs(); renderList();
+  }
   const vt = $('#vegtoggle');
   vt.addEventListener('click', () => {
     vegOnly = !vegOnly;

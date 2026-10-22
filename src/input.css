@@ -161,3 +161,29 @@ body {
 .zoom:hover img {
   transform: scale(1.05);
 }
+
+/* Formerly a <noscript><style> in index.html: with scripting off, revealed content is simply shown. */
+@media (scripting: none) {
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* Menu: Kora draws the menu from the site's menu data into the kora:data:menu region in #menulist (one tab
+   per category). js/app.js moves the tabs into #tabs and adds each dish's dot and leader; these rules give
+   the rows the look the hand-written list had. */
+#menulist .kora-menu .kora-menu__switcher,
+#menulist .kora-menu .kora-menu__nav,
+#menulist .kora-menu .kora-menu__tags { display: none; }
+#menulist .kora-menu .kora-menu__menu,
+#menulist .kora-menu .kora-menu__section { margin: 0; }
+#menulist .kora-menu .kora-menu__menu-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+#menulist .kora-menu .kora-menu__section-title { display: none; }
+#menulist .kora-menu .kora-menu__items { display: block; }
+#menulist .kora-menu .kora-menu__item { display: block; padding: 1.25rem 0; border: 0 solid var(--color-line); border-bottom-width: 1px; }
+#menulist .kora-menu .kora-menu__item.is-last { border-bottom-width: 0; border-color: currentColor; }
+#menulist .kora-menu .kora-menu__item[hidden] { display: none; }
+#menulist .kora-menu .kora-menu__item-head { display: flex; align-items: baseline; justify-content: flex-start; gap: 0.75rem; }
+#menulist .kora-menu .kora-menu__item-name { margin: 0; font-family: var(--font-serif); font-weight: 600; font-size: 22px; line-height: inherit; color: var(--color-ink); }
+#menulist .kora-menu .kora-menu__item-price { flex-shrink: 0; font-family: var(--font-sans); font-weight: 600; font-size: 17px; color: var(--color-garnet); font-variant-numeric: tabular-nums; white-space: normal; }
