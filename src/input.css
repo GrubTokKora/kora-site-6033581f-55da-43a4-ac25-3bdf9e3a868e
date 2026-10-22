@@ -24,9 +24,9 @@
   --color-non-veg: #9E2A2B;
   --color-spice: #C0392B;
 
-  --font-display: Marcellus, Georgia, serif;
-  --font-serif: "Cormorant Garamond", Georgia, serif;
-  --font-sans: Mukta, system-ui, sans-serif;
+  --font-display: var(--kora-font-heading, Marcellus), Georgia, serif;
+  --font-serif: var(--kora-font-accent, "Cormorant Garamond"), Georgia, serif;
+  --font-sans: var(--kora-font-body, Mukta), system-ui, sans-serif;
 
   --radius-brand: 10px;
   --shadow-soft: 0 6px 18px rgba(46, 28, 14, 0.10);
